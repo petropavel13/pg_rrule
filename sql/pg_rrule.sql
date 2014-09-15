@@ -25,7 +25,8 @@ CREATE OR REPLACE FUNCTION rrule_out(rrule)
 
 CREATE TYPE rrule (
    input = rrule_in,
-   output = rrule_out
+   output = rrule_out,
+   internallength = 2760 -- TODO: check sizeof(icalrecurrencetype) on 32-bit machine
 );
 
 
