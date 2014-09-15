@@ -1,0 +1,4 @@
+# pg_rrule extension
+comment = 'RRULE field type for PostgreSQL'
+default_version = '0.0.1'
+relocatable = true

@@ -1,0 +1,25 @@
+{
+    "name": "pg_rrule",
+    "abstract": "RRULE field type for PostgreSQL",
+    "description": "",
+    "version": "0.0.1",
+    "maintainer": "petropavel",
+    "license": "MIT",
+    "provides": {
+        "pg_rrule": {
+            "abstract": "RRULE field type for PostgreSQL",
+            "file": "sql/pg_rrule.sql",
+            "docfile": "doc/pg_rrule.md",
+            "version": "0.0.1"
+        }
+    },
+    "release_status": "beta",
+
+    "generated_by": "petropavel",
+
+
+    "meta-spec": {
+        "version": "1.0.0",
+        "url": "http://pgxn.org/meta/spec.txt"
+    }
+}
