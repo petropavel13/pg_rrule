@@ -15,12 +15,12 @@ CREATE TYPE rrule;
 
 CREATE OR REPLACE FUNCTION rrule_in(cstring)
     RETURNS rrule
-    AS '$libdir/pg_rrule'
+    AS 'MODULE_PATHNAME'
     LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION rrule_out(rrule)
     RETURNS cstring
-    AS '$libdir/pg_rrule'
+    AS 'MODULE_PATHNAME'
     LANGUAGE C IMMUTABLE STRICT;
 
 CREATE TYPE rrule (
@@ -31,12 +31,12 @@ CREATE TYPE rrule (
 
 CREATE OR REPLACE FUNCTION rrule_get_occurrences(rrule, timestamp with time zone)
     RETURNS timestamp with time zone[]
-    AS '$libdir/pg_rrule', 'rrule_get_occurrences_rrule_timestamptz'
+    AS 'MODULE_PATHNAME', 'rrule_get_occurrences_rrule_timestamptz'
     LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION rrule_get_occurrences(rrule, timestamp)
     RETURNS timestamp[]
-    AS '$libdir/pg_rrule', 'rrule_get_occurrences_rrule_timestamp'
+    AS 'MODULE_PATHNAME', 'rrule_get_occurrences_rrule_timestamp'
     LANGUAGE C IMMUTABLE STRICT;
 
 
