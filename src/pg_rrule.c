@@ -23,25 +23,7 @@ Datum rrule_in(PG_FUNCTION_ARGS) {
 
     struct icalrecurrencetype* recurrence_ref = palloc(sizeof(struct icalrecurrencetype));
 
-    // deep clone
-
-    recurrence_ref->freq = recurrence.freq;
-    recurrence_ref->until = recurrence.until;
-    recurrence_ref->count = recurrence.count;
-    recurrence_ref->interval = recurrence.interval;
-    recurrence_ref->week_start = recurrence.week_start;
-
-    int i;
-
-    for (i = 0; i < ICAL_BY_SECOND_SIZE; ++i) recurrence_ref->by_second[i] = recurrence.by_second[i];
-    for (i = 0; i < ICAL_BY_MINUTE_SIZE; ++i) recurrence_ref->by_minute[i] = recurrence.by_minute[i];
-    for (i = 0; i < ICAL_BY_HOUR_SIZE; ++i) recurrence_ref->by_hour[i] = recurrence.by_hour[i];
-    for (i = 0; i < ICAL_BY_DAY_SIZE; ++i) recurrence_ref->by_day[i] = recurrence.by_day[i];
-    for (i = 0; i < ICAL_BY_MONTHDAY_SIZE; ++i) recurrence_ref->by_month_day[i] = recurrence.by_month_day[i];
-    for (i = 0; i < ICAL_BY_YEARDAY_SIZE; ++i) recurrence_ref->by_year_day[i] = recurrence.by_year_day[i];
-    for (i = 0; i < ICAL_BY_WEEKNO_SIZE; ++i) recurrence_ref->by_week_no[i] = recurrence.by_week_no[i];
-    for (i = 0; i < ICAL_BY_MONTH_SIZE; ++i) recurrence_ref->by_month[i] = recurrence.by_month[i];
-    for (i = 0; i < ICAL_BY_SETPOS_SIZE; ++i) recurrence_ref->by_set_pos[i] = recurrence.by_set_pos[i];
+    (*recurrence_ref) = recurrence;
 
     PG_RETURN_POINTER(recurrence_ref);
 }
