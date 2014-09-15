@@ -2,16 +2,33 @@ TEMPLATE = lib
 CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
-#CONFIG += staticlib
 
-INCLUDEPATH += "/usr/include/postgresql/server"
+macx {
+    INCLUDEPATH += "/usr/local/include/server/" \
+                    "/usr/local/include/"
+    LIBS += -L/usr/local/lib/ -lical -lpq
 
-LIBS += -lpq -lical
+    QMAKE_LFLAGS_SHLIB -= -dynamiclib
+    QMAKE_LFLAGS_VERSION = ""
+    QMAKE_LFLAGS_COMPAT_VERSION = ""
+    QMAKE_LFLAGS_SONAME = ""
+
+    QMAKE_LFLAGS = -bundle -flat_namespace -undefined suppress
+
+    QMAKE_EXTENSION_SHLIB = so
+}
+
+unix:!macx {
+    INCLUDEPATH += "/usr/include/postgresql/server"
+
+    LIBS += -lpq -lical
+
+    QMAKE_CFLAGS = -fpic
+}
 
 SOURCES += \
     pg_rrule.c
 
-QMAKE_CFLAGS = -fpic
 
 HEADERS += \
     pg_rrule.h
