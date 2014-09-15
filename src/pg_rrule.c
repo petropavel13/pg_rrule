@@ -17,8 +17,8 @@ Datum rrule_in(PG_FUNCTION_ARGS) {
 
         ereport(ERROR,
                 (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-                 errmsg("String \"%s\" is not correct RRULE. iCal error: %s", rrule_str, icalerror_strerror(err)),
-                 errhint("You need to omit \"RRULE:\" part of expression(if present)")));
+                 errmsg("Can't parse RRULE. iCal error: %s", icalerror_strerror(err)),
+                 errhint("You need to omit \"RRULE:\" part of expression (if present)")));
     }
 
     struct icalrecurrencetype* recurrence_ref = palloc(sizeof(struct icalrecurrencetype));
@@ -41,7 +41,7 @@ Datum rrule_out(PG_FUNCTION_ARGS) {
 
         ereport(ERROR,
                 (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-                 errmsg("Error when converting RRULE to string. iCal error: %s", icalerror_strerror(err)),
+                 errmsg("Can't convert RRULE to string. iCal error: %s", icalerror_strerror(err)),
                  errhint("Please create new issue here: https://github.com/petropavel13/pg_rrule/issues/new")));
     }
 
@@ -105,7 +105,7 @@ Datum rrule_get_occurrences_rrule(struct icalrecurrencetype recurrence,
 
     free(times_array);
 
-    Datum* datum_elems = palloc(sizeof(Datum) * cnt);
+    Datum* const datum_elems = palloc(sizeof(Datum) * cnt);
 
     if (use_tz) {
         for (i = 0; i < cnt; ++i) {
