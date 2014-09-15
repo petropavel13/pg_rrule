@@ -10,18 +10,38 @@ Datum rrule_in(PG_FUNCTION_ARGS) {
 
     struct icalrecurrencetype recurrence = icalrecurrencetype_from_string(rrule_str);
 
-    if (icalerrno != ICAL_NO_ERROR) {
+    const icalerrorenum err = icalerrno;
+
+    if (err != ICAL_NO_ERROR) {
         icalerror_clear_errno();
 
         ereport(ERROR,
                 (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-                 errmsg("String %s is not correct RRULE", rrule_str),
+                 errmsg("String \"%s\" is not correct RRULE. iCal error: %s", rrule_str, icalerror_strerror(err)),
                  errhint("You need to omit \"RRULE:\" part of expression(if present)")));
     }
 
     struct icalrecurrencetype* recurrence_ref = palloc(sizeof(struct icalrecurrencetype));
 
-    memcpy(recurrence_ref, &recurrence, sizeof(struct icalrecurrencetype));
+    // deep clone
+
+    recurrence_ref->freq = recurrence.freq;
+    recurrence_ref->until = recurrence.until;
+    recurrence_ref->count = recurrence.count;
+    recurrence_ref->interval = recurrence.interval;
+    recurrence_ref->week_start = recurrence.week_start;
+
+    int i;
+
+    for (i = 0; i < ICAL_BY_SECOND_SIZE; ++i) recurrence_ref->by_second[i] = recurrence.by_second[i];
+    for (i = 0; i < ICAL_BY_MINUTE_SIZE; ++i) recurrence_ref->by_minute[i] = recurrence.by_minute[i];
+    for (i = 0; i < ICAL_BY_HOUR_SIZE; ++i) recurrence_ref->by_hour[i] = recurrence.by_hour[i];
+    for (i = 0; i < ICAL_BY_DAY_SIZE; ++i) recurrence_ref->by_day[i] = recurrence.by_day[i];
+    for (i = 0; i < ICAL_BY_MONTHDAY_SIZE; ++i) recurrence_ref->by_month_day[i] = recurrence.by_month_day[i];
+    for (i = 0; i < ICAL_BY_YEARDAY_SIZE; ++i) recurrence_ref->by_year_day[i] = recurrence.by_year_day[i];
+    for (i = 0; i < ICAL_BY_WEEKNO_SIZE; ++i) recurrence_ref->by_week_no[i] = recurrence.by_week_no[i];
+    for (i = 0; i < ICAL_BY_MONTH_SIZE; ++i) recurrence_ref->by_month[i] = recurrence.by_month[i];
+    for (i = 0; i < ICAL_BY_SETPOS_SIZE; ++i) recurrence_ref->by_set_pos[i] = recurrence.by_set_pos[i];
 
     PG_RETURN_POINTER(recurrence_ref);
 }
@@ -32,9 +52,20 @@ Datum rrule_out(PG_FUNCTION_ARGS) {
 
     char* const rrule_str = icalrecurrencetype_as_string(recurrence_ref);
 
+    const icalerrorenum err = icalerrno;
+
+    if (err != ICAL_NO_ERROR) {
+        icalerror_clear_errno();
+
+        ereport(ERROR,
+                (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+                 errmsg("Error when converting RRULE to string. iCal error: %s", icalerror_strerror(err)),
+                 errhint("Please create new issue here: https://github.com/petropavel13/pg_rrule/issues/new")));
+    }
+
     const size_t str_bytes = sizeof(char) * (strlen(rrule_str) + 1);
 
-    char* rrule_str_copy = palloc(str_bytes);
+    char* const rrule_str_copy = palloc(str_bytes);
     memcpy(rrule_str_copy, rrule_str, str_bytes);
 
     PG_RETURN_CSTRING(rrule_str_copy);
@@ -149,4 +180,6 @@ void rrule_to_time_t_array(struct icalrecurrencetype recurrence,
         ical_time = (*(icaltimetype*)icalarray_element_at(icaltimes_list, i));
         times_array[i] = icaltime_as_timet_with_zone(ical_time, dtstart.zone);
     }
+
+    icalarray_free(icaltimes_list);
 }
