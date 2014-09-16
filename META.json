@@ -2,7 +2,7 @@
     "name": "pg_rrule",
     "abstract": "RRULE field type for PostgreSQL",
     "description": "",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "maintainer": "petropavel",
     "license": "MIT",
     "provides": {
@@ -10,7 +10,7 @@
             "abstract": "RRULE field type for PostgreSQL",
             "file": "sql/pg_rrule.sql",
             "docfile": "doc/pg_rrule.md",
-            "version": "0.0.1"
+            "version": "0.1.0"
         }
     },
     "release_status": "beta",

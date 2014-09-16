@@ -4,18 +4,33 @@ pg_rrule
 Usage
 -----
 ```sql
- SELECT 'FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule;
+ SELECT 'FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z'::rrule;
+               rrule
+ ------------------------------------
+  FREQ=WEEKLY;UNTIL=20200101T045102Z
+ (1 row)
+```
 
-                                   rrule                                    
- ----------------------------------------------------------------------------
- FREQ=WEEKLY;UNTIL=20200101T045102Z;BYSECOND=2;BYMINUTE=51;BYHOUR=10;BYDAY=SA
+```sql
+ SELECT get_freq('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z'::rrule);
+  get_freq
+ ----------
+  WEEKLY
+ (1 row)
+```
+
+```sql
+ SELECT get_byday('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=MO,TH,SU'::rrule);
+  get_byday
+ -----------
+  {2,5,1}
  (1 row)
 ```
 
 ```sql
  SELECT * FROM
      unnest(
-         rrule_get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule,
+         get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule,
              '2019-12-07 10:51:02+00'::timestamp with time zone)
      );
 
@@ -31,7 +46,7 @@ Usage
 ```sql
  SELECT * FROM
      unnest(
-         rrule_get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule,
+         get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule,
              '2019-12-07 10:51:02'::timestamp)
      );
 
