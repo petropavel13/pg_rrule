@@ -1,9 +1,21 @@
 \set ECHO 0
 
-SELECT 'FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule;
-                                    rrule
-------------------------------------------------------------------------------
- FREQ=WEEKLY;UNTIL=20200101T045102Z;BYSECOND=2;BYMINUTE=51;BYHOUR=10;BYDAY=SA
+SELECT 'FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z'::rrule;
+              rrule
+------------------------------------
+ FREQ=WEEKLY;UNTIL=20200101T045102Z
+(1 row)
+
+SELECT get_byday('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=MO,TH,SU'::rrule);
+ get_byday
+-----------
+ {2,5,1}
+(1 row)
+
+SELECT get_freq('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z'::rrule);
+ get_freq
+----------
+ WEEKLY
 (1 row)
 
 SELECT * FROM
