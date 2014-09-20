@@ -2,15 +2,10 @@ pg_rrule
 ========
 
 Usage
------
-```sql
- SELECT 'FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z'::rrule;
-               rrule
- ------------------------------------
-  FREQ=WEEKLY;UNTIL=20200101T045102Z
- (1 row)
-```
 
+Get RRULE parameter get_PARAMNAME.
+
+Example. Get freq param:
 ```sql
  SELECT get_freq('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z'::rrule);
   get_freq
@@ -18,7 +13,7 @@ Usage
   WEEKLY
  (1 row)
 ```
-
+Example. Get byday param:
 ```sql
  SELECT get_byday('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=MO,TH,SU'::rrule);
   get_byday
@@ -26,7 +21,7 @@ Usage
   {2,5,1}
  (1 row)
 ```
-
+Example. Expand RRULE with timezone:
 ```sql
  SELECT * FROM
      unnest(
@@ -42,7 +37,7 @@ Usage
   2019-12-28 10:51:02+00
  (4 rows)
 ```
-
+Example. Expand RRULE without timezone:
 ```sql
  SELECT * FROM
      unnest(
@@ -58,10 +53,29 @@ Usage
   2019-12-28 10:51:02
  (4 rows)
 ```
- Building
+ Simple building:
  --------
+ ```sh
+ cd src/
+ qmake pg_rrule.pro
+ make
+ ```
+  Simple install (Linux):
+ ```sh
+ cp libpg_rrule.so /usr/lib/postgresql/pg_rrule.so
+ cp pg_rrule.control /usr/share/postgresql/extension/
+ cp sql/pg_rrule.sql /usr/share/postgresql/extension/pg_rrule--0.1.0.sql
+ ```
+ Simple install (OS X):
+ ```sh
+ #TODO
+ ```
+ Install extension (Postgresql):
+ ```sql
+ CREATE EXTENSION pg_rrule;
+ ```
 
-A long description
+Building (A long description (not tested))
 
 To build it, just do this:
 
