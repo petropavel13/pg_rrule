@@ -58,14 +58,14 @@ Datum pg_rrule_out(PG_FUNCTION_ARGS) {
 }
 
 
-Datum pg_rrule_get_occurrences_rrule_timestamptz(PG_FUNCTION_ARGS) {
+Datum pg_rrule_get_occurrences_dtstart_tz(PG_FUNCTION_ARGS) {
     struct icalrecurrencetype* recurrence_ref = (struct icalrecurrencetype*)PG_GETARG_POINTER(0);
-    TimestampTz ts = PG_GETARG_TIMESTAMPTZ(1);
+    TimestampTz dtstart_ts = PG_GETARG_TIMESTAMPTZ(1);
 
     long int gmtoff = 0;
     pg_get_timezone_offset(session_timezone, &gmtoff);
 
-    pg_time_t ts_pg_time_t = timestamptz_to_time_t(ts);
+    pg_time_t dtstart_ts_pg_time_t = timestamptz_to_time_t(dtstart_ts);
 
     icaltimezone* ical_tz = icaltimezone_get_builtin_timezone_from_offset(gmtoff, pg_get_timezone_name(session_timezone));
 
@@ -74,23 +74,61 @@ Datum pg_rrule_get_occurrences_rrule_timestamptz(PG_FUNCTION_ARGS) {
         ical_tz = icaltimezone_get_utc_timezone();
     }
 
-    struct icaltimetype dtstart = icaltime_from_timet_with_zone((time_t)ts_pg_time_t, 0, ical_tz); // it's safe ? time_t may be double, float, etc...
+    struct icaltimetype dtstart = icaltime_from_timet_with_zone((time_t)dtstart_ts_pg_time_t, 0, ical_tz); // it's safe ? time_t may be double, float, etc...
 
     return pg_rrule_get_occurrences_rrule(*recurrence_ref, dtstart, true);
 }
 
-
-Datum pg_rrule_get_occurrences_rrule_timestamp(PG_FUNCTION_ARGS) {
+Datum pg_rrule_get_occurrences_dtstart_until_tz(PG_FUNCTION_ARGS) {
     struct icalrecurrencetype* recurrence_ref = (struct icalrecurrencetype*)PG_GETARG_POINTER(0);
-    Timestamp ts = PG_GETARG_TIMESTAMP(1);
+    TimestampTz dtstart_ts = PG_GETARG_TIMESTAMPTZ(1);
+    TimestampTz until_ts = PG_GETARG_TIMESTAMPTZ(2);
 
-    pg_time_t ts_pg_time_t = timestamptz_to_time_t(ts);
+    long int gmtoff = 0;
+    pg_get_timezone_offset(session_timezone, &gmtoff);
 
-    struct icaltimetype dtstart = icaltime_from_timet_with_zone((time_t)ts_pg_time_t, 0, icaltimezone_get_utc_timezone()); // it's safe ? time_t may be double, float, etc...
+    pg_time_t dtstart_ts_pg_time_t = timestamptz_to_time_t(dtstart_ts);
+    pg_time_t until_ts_pg_time_t = timestamptz_to_time_t(until_ts);
+
+    icaltimezone* ical_tz = icaltimezone_get_builtin_timezone_from_offset(gmtoff, pg_get_timezone_name(session_timezone));
+
+    if (ical_tz == NULL) {
+        elog(WARNING, "Can't get timezone from current session! Fallback to UTC.");
+        ical_tz = icaltimezone_get_utc_timezone();
+    }
+
+    struct icaltimetype dtstart = icaltime_from_timet_with_zone((time_t)dtstart_ts_pg_time_t, 0, ical_tz); // it's safe ? time_t may be double, float, etc...
+    struct icaltimetype until = icaltime_from_timet_with_zone((time_t)until_ts_pg_time_t, 0, ical_tz); // it's safe ? time_t may be double, float, etc...
+
+    return pg_rrule_get_occurrences_rrule_until(*recurrence_ref, dtstart, until, true);
+}
+
+
+Datum pg_rrule_get_occurrences_dtstart(PG_FUNCTION_ARGS) {
+    struct icalrecurrencetype* recurrence_ref = (struct icalrecurrencetype*)PG_GETARG_POINTER(0);
+    Timestamp dtstart_ts = PG_GETARG_TIMESTAMP(1);
+
+    pg_time_t dtstart_ts_pg_time_t = timestamptz_to_time_t(dtstart_ts);
+
+    struct icaltimetype dtstart = icaltime_from_timet_with_zone((time_t)dtstart_ts_pg_time_t, 0, icaltimezone_get_utc_timezone()); // it's safe ? time_t may be double, float, etc...
 
     return pg_rrule_get_occurrences_rrule(*recurrence_ref, dtstart, false);
 }
 
+
+Datum pg_rrule_get_occurrences_dtstart_until(PG_FUNCTION_ARGS) {
+    struct icalrecurrencetype* recurrence_ref = (struct icalrecurrencetype*)PG_GETARG_POINTER(0);
+    Timestamp dtstart_ts = PG_GETARG_TIMESTAMP(1);
+    Timestamp until_ts = PG_GETARG_TIMESTAMPTZ(2);
+
+    pg_time_t dtstart_ts_pg_time_t = timestamptz_to_time_t(dtstart_ts);
+    pg_time_t until_ts_pg_time_t = timestamptz_to_time_t(until_ts);
+
+    struct icaltimetype dtstart = icaltime_from_timet_with_zone((time_t)dtstart_ts_pg_time_t, 0, icaltimezone_get_utc_timezone()); // it's safe ? time_t may be double, float, etc...
+    struct icaltimetype until = icaltime_from_timet_with_zone((time_t)until_ts_pg_time_t, 0, icaltimezone_get_utc_timezone()); // it's safe ? time_t may be double, float, etc...
+
+    return pg_rrule_get_occurrences_rrule_until(*recurrence_ref, dtstart, until, false);
+}
 
 /* FREQ */
 Datum pg_rrule_get_freq_rrule(PG_FUNCTION_ARGS) {
@@ -398,12 +436,19 @@ Datum pg_rrule_get_wkst_rrule(PG_FUNCTION_ARGS) {
 
 
 Datum pg_rrule_get_occurrences_rrule(struct icalrecurrencetype recurrence,
-                                  struct icaltimetype dtstart,
-                                  bool use_tz) {
+                                     struct icaltimetype dtstart,
+                                     bool use_tz) {
+    return pg_rrule_get_occurrences_rrule_until(recurrence, dtstart, icaltime_null_time(), use_tz);
+}
+
+Datum pg_rrule_get_occurrences_rrule_until(struct icalrecurrencetype recurrence,
+                                           struct icaltimetype dtstart,
+                                           struct icaltimetype until,
+                                           bool use_tz) {
     time_t* times_array = NULL;
     unsigned int cnt = 0;
 
-    pg_rrule_to_time_t_array(recurrence, dtstart, &times_array, &cnt);
+    pg_rrule_rrule_to_time_t_array_until(recurrence, dtstart, until, &times_array, &cnt);
     pg_time_t* pg_times_array = palloc(sizeof(pg_time_t) * cnt);
 
     unsigned int i;
@@ -442,10 +487,18 @@ Datum pg_rrule_get_occurrences_rrule(struct icalrecurrencetype recurrence,
 }
 
 
-void pg_rrule_to_time_t_array(struct icalrecurrencetype recurrence,
-                           struct icaltimetype dtstart,
-                           time_t** const out_array,
-                           unsigned int* const out_count) {
+void pg_rrule_rrule_to_time_t_array(struct icalrecurrencetype recurrence,
+                                    struct icaltimetype dtstart,
+                                    time_t** const out_array,
+                                    unsigned int* const out_count) {
+    pg_rrule_rrule_to_time_t_array_until(recurrence, dtstart, icaltime_null_time(), out_array, out_count);
+}
+
+void pg_rrule_rrule_to_time_t_array_until(struct icalrecurrencetype recurrence,
+                                          struct icaltimetype dtstart,
+                                          struct icaltimetype until,
+                                          time_t** const out_array,
+                                          unsigned int* const out_count) {
 
     icalrecur_iterator* const recur_iterator = icalrecur_iterator_new(recurrence, dtstart);
 
@@ -453,9 +506,17 @@ void pg_rrule_to_time_t_array(struct icalrecurrencetype recurrence,
 
     struct icaltimetype ical_time = icalrecur_iterator_next(recur_iterator);
 
-    while (!icaltime_is_null_time(ical_time)) {
-        icalarray_append(icaltimes_list, &ical_time);
-        ical_time = icalrecur_iterator_next(recur_iterator);
+    if (icaltime_is_null_time(until)) {
+        while (icaltime_is_null_time(ical_time) == false) {
+            icalarray_append(icaltimes_list, &ical_time);
+            ical_time = icalrecur_iterator_next(recur_iterator);
+        }
+    } else {
+        while (icaltime_is_null_time(ical_time) == false
+               && icaltime_compare(ical_time, until) != 1 ) { // while ical_time <= until
+            icalarray_append(icaltimes_list, &ical_time);
+            ical_time = icalrecur_iterator_next(recur_iterator);
+        }
     }
 
     icalrecur_iterator_free(recur_iterator);

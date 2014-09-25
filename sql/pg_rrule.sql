@@ -39,12 +39,23 @@ CREATE CAST (varchar AS rrule)
 
 CREATE OR REPLACE FUNCTION get_occurrences(rrule, timestamp with time zone)
     RETURNS timestamp with time zone[]
-    AS 'MODULE_PATHNAME', 'pg_rrule_get_occurrences_rrule_timestamptz'
+    AS 'MODULE_PATHNAME', 'pg_rrule_get_occurrences_dtstart_tz'
     LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION get_occurrences(rrule, timestamp with time zone, timestamp with time zone)
+    RETURNS timestamp with time zone[]
+    AS 'MODULE_PATHNAME', 'pg_rrule_get_occurrences_dtstart_until_tz'
+    LANGUAGE C IMMUTABLE STRICT;
+
 
 CREATE OR REPLACE FUNCTION get_occurrences(rrule, timestamp)
     RETURNS timestamp[]
-    AS 'MODULE_PATHNAME', 'pg_rrule_get_occurrences_rrule_timestamp'
+    AS 'MODULE_PATHNAME', 'pg_rrule_get_occurrences_dtstart'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION get_occurrences(rrule, timestamp, timestamp)
+    RETURNS timestamp[]
+    AS 'MODULE_PATHNAME', 'pg_rrule_get_occurrences_dtstart_until'
     LANGUAGE C IMMUTABLE STRICT;
 
 

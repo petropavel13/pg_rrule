@@ -14,11 +14,17 @@ Datum pg_rrule_in(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(pg_rrule_out);
 Datum pg_rrule_out(PG_FUNCTION_ARGS);
 
-PG_FUNCTION_INFO_V1(pg_rrule_get_occurrences_rrule_timestamptz);
-Datum pg_rrule_get_occurrences_rrule_timestamptz(PG_FUNCTION_ARGS);
+PG_FUNCTION_INFO_V1(pg_rrule_get_occurrences_dtstart_tz);
+Datum pg_rrule_get_occurrences_dtstart_tz(PG_FUNCTION_ARGS);
 
-PG_FUNCTION_INFO_V1(pg_rrule_get_occurrences_rrule_timestamp);
-Datum pg_rrule_get_occurrences_rrule_timestamp(PG_FUNCTION_ARGS);
+PG_FUNCTION_INFO_V1(pg_rrule_get_occurrences_dtstart_until_tz);
+Datum pg_rrule_get_occurrences_dtstart_until_tz(PG_FUNCTION_ARGS);
+
+PG_FUNCTION_INFO_V1(pg_rrule_get_occurrences_dtstart);
+Datum pg_rrule_get_occurrences_dtstart(PG_FUNCTION_ARGS);
+
+PG_FUNCTION_INFO_V1(pg_rrule_get_occurrences_dtstart_until);
+Datum pg_rrule_get_occurrences_dtstart_until(PG_FUNCTION_ARGS);
 
 /* FREQ */
 PG_FUNCTION_INFO_V1(pg_rrule_get_freq_rrule);
@@ -85,9 +91,21 @@ Datum pg_rrule_get_occurrences_rrule(struct icalrecurrencetype recurrence,
                                      struct icaltimetype dtstart,
                                      bool use_tz);
 
-void pg_rrule_to_time_t_array(struct icalrecurrencetype recurrence,
-                              struct icaltimetype dtstart,
-                              time_t** const out_array,
-                              unsigned int* const out_count);
+Datum pg_rrule_get_occurrences_rrule_until(struct icalrecurrencetype recurrence,
+                                           struct icaltimetype dtstart,
+                                           struct icaltimetype until,
+                                           bool use_tz);
+
+
+void pg_rrule_rrule_to_time_t_array(struct icalrecurrencetype recurrence,
+                                    struct icaltimetype dtstart,
+                                    time_t** const out_array,
+                                    unsigned int* const out_count);
+
+void pg_rrule_rrule_to_time_t_array_until(struct icalrecurrencetype recurrence,
+                                          struct icaltimetype dtstart,
+                                          struct icaltimetype until,
+                                          time_t** const out_array,
+                                          unsigned int* const out_count);
 
 #endif // PG_RRULE_H
