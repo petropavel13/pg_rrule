@@ -27,3 +27,6 @@ endif
 
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
+
+src/pg_rrule.o: CFLAGS += $(shell pkg-config --cflags libical)
+pg_rrule.so: SHLIB_LINK += $(shell pkg-config --libs libical)
