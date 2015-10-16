@@ -30,3 +30,6 @@ include $(PGXS)
 
 src/pg_rrule.o: CFLAGS += $(shell pkg-config --cflags libical)
 pg_rrule.so: SHLIB_LINK += $(shell pkg-config --libs libical)
+
+sql/pg_rrule.sql: sql/pg_rrule.sql.in
+	sed 's,MODULE_PATHNAME,$$libdir/$(@:sql/%.sql=%),g' $< >$@
