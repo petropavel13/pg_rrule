@@ -10,7 +10,8 @@ REGRESS_OPTS = --inputdir=test --load-language=plpgsql
 # Uncoment the MODULES line if you are adding C files
 # to your extention.
 #
-MODULES      = $(patsubst %.c,%,$(wildcard src/*.c))
+MODULE_big   = pg_rrule
+OBJS         = $(patsubst %.c,%.o,$(wildcard src/*.c))
 PG_CONFIG    = pg_config
 PG91         = $(shell $(PG_CONFIG) --version | grep -qE " 8\.| 9\.0" && echo no || echo yes)
 
@@ -26,3 +27,9 @@ endif
 
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
+
+src/pg_rrule.o: CFLAGS += $(shell pkg-config --cflags libical)
+pg_rrule.so: SHLIB_LINK += $(shell pkg-config --libs libical)
+
+sql/pg_rrule.sql: sql/pg_rrule.sql.in
+	sed 's,MODULE_PATHNAME,$$libdir/$(@:sql/%.sql=%),g' $< >$@
