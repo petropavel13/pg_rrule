@@ -25,6 +25,13 @@ Datum pg_rrule_in(PG_FUNCTION_ARGS) {
                  errhint("You need to omit \"RRULE:\" part of expression (if present)")));
     }
 
+    if (recurrence.freq == ICAL_NO_RECURRENCE) {
+        // libical 1.0 won't round trip this, so we treat it as an error.
+        ereport(ERROR,
+                (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+                 errmsg("Invalid RRULE frequency. RRULE \"%s\".", rrule_str)));
+    }
+
     struct icalrecurrencetype* recurrence_ref = palloc(sizeof(struct icalrecurrencetype));
 
     (*recurrence_ref) = recurrence;
