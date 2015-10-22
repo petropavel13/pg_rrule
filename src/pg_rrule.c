@@ -70,16 +70,17 @@ Datum pg_rrule_get_occurrences_dtstart_tz(PG_FUNCTION_ARGS) {
     TimestampTz dtstart_ts = PG_GETARG_TIMESTAMPTZ(1);
 
     long int gmtoff = 0;
-    pg_get_timezone_offset(session_timezone, &gmtoff);
-
-    pg_time_t dtstart_ts_pg_time_t = timestamptz_to_time_t(dtstart_ts);
-
-    icaltimezone* ical_tz = icaltimezone_get_builtin_timezone_from_offset(gmtoff, pg_get_timezone_name(session_timezone));
+    icaltimezone* ical_tz = NULL;
+    if (pg_get_timezone_offset(session_timezone, &gmtoff)) {
+        ical_tz = icaltimezone_get_builtin_timezone_from_offset(gmtoff, pg_get_timezone_name(session_timezone));
+    }
 
     if (ical_tz == NULL) {
         elog(WARNING, "Can't get timezone from current session! Fallback to UTC.");
         ical_tz = icaltimezone_get_utc_timezone();
     }
+
+    pg_time_t dtstart_ts_pg_time_t = timestamptz_to_time_t(dtstart_ts);
 
     struct icaltimetype dtstart = icaltime_from_timet_with_zone((time_t)dtstart_ts_pg_time_t, 0, ical_tz); // it's safe ? time_t may be double, float, etc...
 
@@ -92,17 +93,18 @@ Datum pg_rrule_get_occurrences_dtstart_until_tz(PG_FUNCTION_ARGS) {
     TimestampTz until_ts = PG_GETARG_TIMESTAMPTZ(2);
 
     long int gmtoff = 0;
-    pg_get_timezone_offset(session_timezone, &gmtoff);
-
-    pg_time_t dtstart_ts_pg_time_t = timestamptz_to_time_t(dtstart_ts);
-    pg_time_t until_ts_pg_time_t = timestamptz_to_time_t(until_ts);
-
-    icaltimezone* ical_tz = icaltimezone_get_builtin_timezone_from_offset(gmtoff, pg_get_timezone_name(session_timezone));
+    icaltimezone* ical_tz = NULL;
+    if (pg_get_timezone_offset(session_timezone, &gmtoff)) {
+        ical_tz = icaltimezone_get_builtin_timezone_from_offset(gmtoff, pg_get_timezone_name(session_timezone));
+    }
 
     if (ical_tz == NULL) {
         elog(WARNING, "Can't get timezone from current session! Fallback to UTC.");
         ical_tz = icaltimezone_get_utc_timezone();
     }
+
+    pg_time_t dtstart_ts_pg_time_t = timestamptz_to_time_t(dtstart_ts);
+    pg_time_t until_ts_pg_time_t = timestamptz_to_time_t(until_ts);
 
     struct icaltimetype dtstart = icaltime_from_timet_with_zone((time_t)dtstart_ts_pg_time_t, 0, ical_tz); // it's safe ? time_t may be double, float, etc...
     struct icaltimetype until = icaltime_from_timet_with_zone((time_t)until_ts_pg_time_t, 0, ical_tz); // it's safe ? time_t may be double, float, etc...
@@ -174,9 +176,10 @@ Datum pg_rrule_get_untiltz_rrule(PG_FUNCTION_ARGS) {
     }
 
     long int gmtoff = 0;
-    pg_get_timezone_offset(session_timezone, &gmtoff);
-
-    icaltimezone* ical_tz = icaltimezone_get_builtin_timezone_from_offset(gmtoff, pg_get_timezone_name(session_timezone));
+    icaltimezone* ical_tz = NULL;
+    if (pg_get_timezone_offset(session_timezone, &gmtoff)) {
+        ical_tz = icaltimezone_get_builtin_timezone_from_offset(gmtoff, pg_get_timezone_name(session_timezone));
+    }
 
     if (ical_tz == NULL) {
         elog(WARNING, "Can't get timezone from current session! Fallback to UTC.");
