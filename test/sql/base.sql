@@ -1,4 +1,4 @@
-\set ECHO 0
+\set ECHO none
 BEGIN;
 \i sql/pg_rrule.sql
 \set ECHO all

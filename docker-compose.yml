@@ -5,13 +5,7 @@ services:
     image: postgres:12-alpine
     ports:
       - 5433:5432
-    restart: always
-    # environment:
-    #   POSTGRES_USER: crossuite
-    #   POSTGRES_PASSWORD: crossuite
-    #   POSTGRES_DB: crossuite
-    volumes:
-      # - ./pg_rrule-build.sh:/docker-entrypoint-initdb.d/20-restore.sh
-      - ./:/usr/src/app
-    #   - ./dump.sh:/usr/src/dump.sh
-    #   - postgres11-vol:/var/lib/postgresql/data
+    volumes: 
+      - .:/usr/src/app
+    tty: true
+    working_dir: /usr/src/app
