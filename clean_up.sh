@@ -25,7 +25,20 @@ fi
 if test -f ./results/base.out; then
 	rm ./results/base.out
 fi
-
-if test -f ./$CUSTOM_PGXS; then
-	rm ./$CUSTOM_PGXS
+if test -f ./src/Makefile; then
+	rm ./src/Makefile
 fi
+if test -f ./src/.qmake.stash; then
+	rm ./src/.qmake.stash
+fi
+if test -f ./src/libpg_rrule.so.1; then
+	rm ./src/libpg_rrule.so.1
+fi
+if test -f ./src/libpg_rrule.so.1.0; then
+	rm ./src/libpg_rrule.so.1.0
+fi
+if test -f ./src/libpg_rrule.so.1.0.0; then
+	rm ./src/libpg_rrule.so.1.0.0
+fi
+
+# apk del tar qt5-qtbase-dev g++ clang libical-dev postgresql-dev llvm8 make

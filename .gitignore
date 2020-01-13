@@ -48,3 +48,4 @@ regression.out
 
 .vscode/
 /src/pg_rrule.bc
+.sql
