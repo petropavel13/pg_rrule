@@ -40,5 +40,8 @@ fi
 if test -f ./src/libpg_rrule.so.1.0.0; then
 	rm ./src/libpg_rrule.so.1.0.0
 fi
+if test -e ./pg_rrule_ext; then
+	rm -rf ./pg_rrule_ext
+fi
 
-# apk del tar qt5-qtbase-dev g++ clang libical-dev postgresql-dev llvm8 make
+# apk del tar g++ clang libical postgresql-dev llvm8

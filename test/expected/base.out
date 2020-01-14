@@ -19,15 +19,16 @@ SELECT get_freq('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z'::rrule);
 
 SELECT * FROM
     unnest(
-            get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule,
-                            '2019-12-07 10:51:02+00'::timestamp with time zone)
-        );
-unnest
-------------------------
- 2019-12-07 10:51:02+00
- 2019-12-14 10:51:02+00
- 2019-12-21 10:51:02+00
- 2019-12-28 10:51:02+00
+        get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule,
+            '2019-12-07 10:51:02+00'::timestamp with time zone)
+    );
+WARNING:  Can't get timezone from current session! Fallback to UTC.
+            unnest            
+------------------------------
+ Sat Dec 07 02:51:02 2019 PST
+ Sat Dec 14 02:51:02 2019 PST
+ Sat Dec 21 02:51:02 2019 PST
+ Sat Dec 28 02:51:02 2019 PST
 (4 rows)
 
 SELECT * FROM
