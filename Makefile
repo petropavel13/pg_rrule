@@ -38,8 +38,24 @@ pg_rrule.so: SHLIB_LINK += $(shell pkg-config --libs libical)
 sql/pg_rrule.sql: sql/pg_rrule.sql.in
 	sed 's,MODULE_PATHNAME,$$libdir/$(@:sql/%.sql=%),g' $< >$@
 
+_build_image:
+	chmod 777 docker-entrypoint.sh
+	docker build -t postgres:11.4-alpine-dev .
+
+_rm_image:
+	docker rmi $$(docker images --format '{{.Repository}}:{{.Tag}}' | grep '11.4-alpine-dev') -f
+
+_run_docker:
+	docker-compose up -d pg-rrule
+
+_to_docker_as_pg:
+	docker exec -it --user=postgres pg-rrule /bin/sh
+
+_to_docker_as_root:
+	docker exec -it pg-rrule /bin/sh
+
 _install_packages:
-	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "apk add tar qt5-qtbase-dev g++ clang libical-dev postgresql-dev llvm8 make"
+	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "apk add tar g++ clang libical-dev postgresql-dev llvm8 make"
 
 _compile:
 	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "make"
@@ -50,7 +66,10 @@ _install:
 _tests:
 	docker-compose exec --user=postgres ${DOCKER_NAME} /bin/sh -c "make installcheck"
 
-_build: _install_packages _compile _install _tests
+_write_output:
+	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "export EXTVERSION=${EXTVERSION} && ./make_output.sh"
+
+_build: _run_docker _install_packages _compile _install _tests _write_output
 
 _clean_up:
 	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "make clean && ./clean_up.sh"
