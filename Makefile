@@ -55,7 +55,7 @@ _to_docker_as_root:
 	docker exec -it pg-rrule /bin/sh
 
 _install_packages:
-	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "apk add tar g++ clang libical-dev postgresql-dev llvm8 make"
+	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "apk add g++ clang libical-dev postgresql-dev llvm8 make"
 
 _compile:
 	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "make"
@@ -64,6 +64,15 @@ _install:
 	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "export EXTVERSION=${EXTVERSION} && ./install.sh"
 
 _tests:
+ifeq ("$(wildcard ./regression.out)","")
+	echo >> ./regression.out && chmod 777 regression.out
+endif
+ifeq ("$(wildcard ./regression.diffs)","")
+	echo >> ./regression.diffs && chmod 777 regression.diffs
+endif
+ifeq ("$(wildcard ./results)","")
+	mkdir ./results && chmod 777 ./results
+endif
 	docker-compose exec --user=postgres ${DOCKER_NAME} /bin/sh -c "make installcheck"
 
 _write_output:
@@ -73,3 +82,13 @@ _build: _run_docker _install_packages _compile _install _tests _write_output
 
 _clean_up:
 	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "make clean && ./clean_up.sh"
+
+_export:
+ifeq ("$(wildcard ./pg_rrule_ext)","")
+	mkdir ./pg_rrule_ext && chmod 777 ./pg_rrule_ext
+endif
+
+	cp ./pg_rrule.so ./pg_rrule_ext
+	cp ./pg_rrule.control ./pg_rrule_ext
+	cp ./sql/pg_rrule--0.2.0.sql ./pg_rrule_ext
+	cp ./doc/pg_rrule.md ./pg_rrule_ext

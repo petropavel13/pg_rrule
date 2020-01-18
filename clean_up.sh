@@ -44,4 +44,4 @@ if test -d ./output; then
 	rm -rf ./output
 fi
 
-# apk del tar qt5-qtbase-dev g++ clang libical-dev postgresql-dev llvm8 make
+# apk del tar g++ clang libical postgresql-dev llvm8
