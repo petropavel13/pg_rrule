@@ -152,3 +152,10 @@ Copyright and License
 
 Copyright (c) 2014 petropavel.
 
+## Debug
+
+1. Go inside container like postgres user
+    - psql
+    - SELECT pg_backend_pid(); -> will output PID
+2. Go inside container like root user
+    - lldb -p {PID}

@@ -40,22 +40,22 @@ sql/pg_rrule.sql: sql/pg_rrule.sql.in
 
 _build_image:
 	chmod 777 docker-entrypoint.sh
-	docker build -t postgres:11.4-alpine-dev .
+	docker build -t postgres:11.6-alpine-dev .
 
 _rm_image:
-	docker rmi $$(docker images --format '{{.Repository}}:{{.Tag}}' | grep '11.4-alpine-dev') -f
+	docker rmi $$(docker images --format '{{.Repository}}:{{.Tag}}' | grep '11.6-alpine-dev') -f
 
 _run_docker:
-	docker-compose up -d pg-rrule
+	docker-compose up -d ${DOCKER_NAME}
 
 _to_docker_as_pg:
-	docker exec -it --user=postgres pg-rrule /bin/sh
+	docker exec -it --user=postgres ${DOCKER_NAME} /bin/sh
 
 _to_docker_as_root:
-	docker exec -it pg-rrule /bin/sh
+	docker exec -it ${DOCKER_NAME} /bin/sh
 
 _install_packages:
-	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "apk add g++ clang libical-dev postgresql-dev llvm8 make"
+	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "apk add g++ clang libical-dev postgresql-dev llvm9 make && apk add lldb --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --allow-untrusted"
 
 _compile:
 	docker-compose exec --user=root ${DOCKER_NAME} /bin/sh -c "make"

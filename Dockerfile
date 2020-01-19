@@ -1,5 +1,5 @@
 # vim:set ft=dockerfile:
-FROM alpine:3.10
+FROM alpine:edge
 
 # alpine includes "postgres" user/group in base install
 #   /etc/passwd:22:postgres:x:70:70::/var/lib/postgresql:/bin/sh
@@ -7,6 +7,8 @@ FROM alpine:3.10
 # the home directory for the postgres user, however, is not created by default
 # see https://github.com/docker-library/postgres/issues/274
 RUN set -ex; \
+	echo "postgres:x:70:70::/var/lib/postgresql:/bin/sh" >> /etc/passwd; \
+	addgroup postgres; adduser postgres postgres; \
 	postgresHome="$(getent passwd postgres)"; \
 	postgresHome="$(echo "$postgresHome" | cut -d: -f6)"; \
 	[ "$postgresHome" = '/var/lib/postgresql' ]; \
@@ -22,7 +24,7 @@ ENV LANG en_US.utf8
 RUN mkdir /docker-entrypoint-initdb.d
 
 ENV PG_MAJOR 11
-ENV PG_VERSION 11.4
+ENV PG_VERSION 11.6
 
 RUN set -ex \
 	\
@@ -51,7 +53,7 @@ RUN set -ex \
 		libxml2-dev \
 		libxslt-dev \
 		linux-headers \
-		llvm8-dev clang g++ \
+		llvm9-dev clang g++ \
 		make \
 #		openldap-dev \
 		openssl-dev \

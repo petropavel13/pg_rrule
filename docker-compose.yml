@@ -1,8 +1,10 @@
 version: '3.4'
 services:
   pg-rrule:
+    cap_add:
+    - SYS_PTRACE
     container_name: pg-rrule
-    image: postgres:11.4-alpine-dev
+    image: postgres:11.6-alpine-dev
     ports:
       - 5433:5432
     volumes: 
