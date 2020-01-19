@@ -87,22 +87,22 @@ PG_FUNCTION_INFO_V1(pg_rrule_get_wkst_rrule);
 Datum pg_rrule_get_wkst_rrule(PG_FUNCTION_ARGS);
 
 
-Datum pg_rrule_get_occurrences_rrule(struct icalrecurrencetype recurrence,
+Datum pg_rrule_get_occurrences_rrule(struct icalrecurrencetype *recurrence,
                                      struct icaltimetype dtstart,
                                      bool use_tz);
 
-Datum pg_rrule_get_occurrences_rrule_until(struct icalrecurrencetype recurrence,
+Datum pg_rrule_get_occurrences_rrule_until(struct icalrecurrencetype *recurrence,
                                            struct icaltimetype dtstart,
                                            struct icaltimetype until,
                                            bool use_tz);
 
 
-void pg_rrule_rrule_to_time_t_array(struct icalrecurrencetype recurrence,
+void pg_rrule_rrule_to_time_t_array(struct icalrecurrencetype *recurrence,
                                     struct icaltimetype dtstart,
                                     time_t** const out_array,
                                     unsigned int* const out_count);
 
-void pg_rrule_rrule_to_time_t_array_until(struct icalrecurrencetype recurrence,
+void pg_rrule_rrule_to_time_t_array_until(struct icalrecurrencetype *recurrence,
                                           struct icaltimetype dtstart,
                                           struct icaltimetype until,
                                           time_t** const out_array,

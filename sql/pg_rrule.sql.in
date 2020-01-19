@@ -11,154 +11,154 @@
 SET client_min_messages = warning;
 
 
-CREATE TYPE rrule;
+-- CREATE TYPE rrule;
 
-CREATE OR REPLACE FUNCTION rrule_in(cstring)
-    RETURNS rrule
-    AS 'MODULE_PATHNAME', 'pg_rrule_in'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE OR REPLACE FUNCTION rrule_out(rrule)
-    RETURNS cstring
-    AS 'MODULE_PATHNAME', 'pg_rrule_out'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE TYPE rrule (
-   input = rrule_in,
-   output = rrule_out,
-   internallength = 2760 -- TODO: check sizeof(icalrecurrencetype) on 32-bit machine
-);
-
-
-CREATE CAST (text AS rrule)
-    WITH INOUT;
-
-CREATE CAST (varchar AS rrule)
-    WITH INOUT;
+-- CREATE OR REPLACE FUNCTION rrule_in(cstring)
+--     RETURNS rrule
+--     AS 'MODULE_PATHNAME', 'pg_rrule_in'
+--     LANGUAGE C IMMUTABLE STRICT;
+-- 
+-- CREATE OR REPLACE FUNCTION rrule_out(text)
+--     RETURNS cstring
+--     AS 'MODULE_PATHNAME', 'pg_rrule_out'
+--     LANGUAGE C IMMUTABLE STRICT;
+-- 
+-- CREATE TYPE rrule (
+--    input = rrule_in,
+--    output = rrule_out,
+--    internallength = 2760 -- TODO: check sizeof(icalrecurrencetype) on 32-bit machine
+-- );
 
 
-CREATE OR REPLACE FUNCTION get_occurrences(rrule, timestamp with time zone)
+-- CREATE CAST (text AS rrule)
+--     WITH INOUT;
+
+-- CREATE CAST (varchar AS rrule)
+--    WITH INOUT;
+
+
+CREATE OR REPLACE FUNCTION get_occurrences(text, timestamp with time zone)
     RETURNS timestamp with time zone[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_occurrences_dtstart_tz'
     LANGUAGE C IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION get_occurrences(rrule, timestamp with time zone, timestamp with time zone)
+CREATE OR REPLACE FUNCTION get_occurrences(text, timestamp with time zone, timestamp with time zone)
     RETURNS timestamp with time zone[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_occurrences_dtstart_until_tz'
     LANGUAGE C IMMUTABLE STRICT;
 
 
-CREATE OR REPLACE FUNCTION get_occurrences(rrule, timestamp)
+CREATE OR REPLACE FUNCTION get_occurrences(text, timestamp)
     RETURNS timestamp[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_occurrences_dtstart'
     LANGUAGE C IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION get_occurrences(rrule, timestamp, timestamp)
+CREATE OR REPLACE FUNCTION get_occurrences(text, timestamp, timestamp)
     RETURNS timestamp[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_occurrences_dtstart_until'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* FREQ */
-CREATE OR REPLACE FUNCTION get_freq(rrule)
+CREATE OR REPLACE FUNCTION get_freq(text)
     RETURNS text
     AS 'MODULE_PATHNAME', 'pg_rrule_get_freq_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* UNTIL */
-CREATE OR REPLACE FUNCTION get_until(rrule)
+CREATE OR REPLACE FUNCTION get_until(text)
     RETURNS timestamp
     AS 'MODULE_PATHNAME', 'pg_rrule_get_until_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* UNTIL TZ */
-CREATE OR REPLACE FUNCTION get_untiltz(rrule)
+CREATE OR REPLACE FUNCTION get_untiltz(text)
     RETURNS timestamp with time zone
     AS 'MODULE_PATHNAME', 'pg_rrule_get_untiltz_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* COUNT */
-CREATE OR REPLACE FUNCTION get_count(rrule)
+CREATE OR REPLACE FUNCTION get_count(text)
     RETURNS int4
     AS 'MODULE_PATHNAME', 'pg_rrule_get_count_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* INTERVAL */
-CREATE OR REPLACE FUNCTION get_interval(rrule)
+CREATE OR REPLACE FUNCTION get_interval(text)
     RETURNS int2
     AS 'MODULE_PATHNAME', 'pg_rrule_get_interval_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* BYSECOND */
-CREATE OR REPLACE FUNCTION get_bysecond(rrule)
+CREATE OR REPLACE FUNCTION get_bysecond(text)
     RETURNS int2[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_bysecond_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* BYMINUTE */
-CREATE OR REPLACE FUNCTION get_byminute(rrule)
+CREATE OR REPLACE FUNCTION get_byminute(text)
     RETURNS int2[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_byminute_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* BYHOUR */
-CREATE OR REPLACE FUNCTION get_byhour(rrule)
+CREATE OR REPLACE FUNCTION get_byhour(text)
     RETURNS int2[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_byhour_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* BYDAY */
-CREATE OR REPLACE FUNCTION get_byday(rrule)
+CREATE OR REPLACE FUNCTION get_byday(text)
     RETURNS int2[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_byday_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* BYMONTHDAY */
-CREATE OR REPLACE FUNCTION get_bymonthday(rrule)
+CREATE OR REPLACE FUNCTION get_bymonthday(text)
     RETURNS int2[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_bymonthday_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* BYYEARDAY */
-CREATE OR REPLACE FUNCTION get_byyearday(rrule)
+CREATE OR REPLACE FUNCTION get_byyearday(text)
     RETURNS int2[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_byyearday_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* BYWEEKNO */
-CREATE OR REPLACE FUNCTION get_byweekno(rrule)
+CREATE OR REPLACE FUNCTION get_byweekno(text)
     RETURNS int2[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_byweekno_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* BYMONTH */
-CREATE OR REPLACE FUNCTION get_bymonth(rrule)
+CREATE OR REPLACE FUNCTION get_bymonth(text)
     RETURNS int2[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_bymonth_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* BYSETPOS */
-CREATE OR REPLACE FUNCTION get_bysetpos(rrule)
+CREATE OR REPLACE FUNCTION get_bysetpos(text)
     RETURNS int2[]
     AS 'MODULE_PATHNAME', 'pg_rrule_get_bysetpos_rrule'
     LANGUAGE C IMMUTABLE STRICT;
 
 
 /* WKST */
-CREATE OR REPLACE FUNCTION get_wkst(rrule)
+CREATE OR REPLACE FUNCTION get_wkst(text)
     RETURNS text
     AS 'MODULE_PATHNAME', 'pg_rrule_get_wkst_rrule'
     LANGUAGE C IMMUTABLE STRICT;

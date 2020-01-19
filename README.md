@@ -7,7 +7,7 @@ Get RRULE parameter get_PARAMNAME.
 
 Example. Get freq param:
 ```sql
- SELECT get_freq('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z'::rrule);
+ SELECT get_freq('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z');
   get_freq
  ----------
   WEEKLY
@@ -15,7 +15,7 @@ Example. Get freq param:
 ```
 Example. Get byday param:
 ```sql
- SELECT get_byday('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=MO,TH,SU'::rrule);
+ SELECT get_byday('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=MO,TH,SU');
   get_byday
  -----------
   {2,5,1}
@@ -25,7 +25,7 @@ Example. Expand RRULE with timezone:
 ```sql
  SELECT * FROM
      unnest(
-         get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule,
+         get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2',
              '2019-12-07 10:51:02+00'::timestamp with time zone)
      );
 
@@ -41,7 +41,7 @@ Example. Expand RRULE without timezone:
 ```sql
  SELECT * FROM
      unnest(
-         get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule,
+         get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2',
              '2019-12-07 10:51:02'::timestamp)
      );
 
