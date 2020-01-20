@@ -1,7 +1,18 @@
 pg_rrule
 ========
 
-Usage
+## Docker Image
+
+docker.pkg.github.com/ondrej-111/pg_rrule/postgres:11.6-alpine-dev
+
+### Pull image 
+`docker pull docker.pkg.github.com/ondrej-111/pg_rrule/postgres:11.6-alpine-dev`
+
+### Use as base image
+
+`FROM docker.pkg.github.com/ondrej-111/pg_rrule/postgres:11.6-alpine-dev`
+
+## Usage
 
 Get RRULE parameter get_PARAMNAME.
 

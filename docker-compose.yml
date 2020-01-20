@@ -4,7 +4,7 @@ services:
     cap_add:
     - SYS_PTRACE
     container_name: pg-rrule
-    image: postgres:11.6-alpine-dev
+    image: docker.pkg.github.com/ondrej-111/pg_rrule/postgres:11.6-alpine-dev
     ports:
       - 5433:5432
     volumes: 
