@@ -1,47 +1,109 @@
-\set ECHO 0
-
-SELECT 'FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z'::rrule;
-              rrule
-------------------------------------
- FREQ=WEEKLY;UNTIL=20200101T045102Z
+\set ECHO none
+SELECT 'FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z';
+                       ?column?                        
+-------------------------------------------------------
+ FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z
 (1 row)
 
-SELECT get_byday('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=MO,TH,SU'::rrule);
- get_byday
+SELECT get_byday('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=MO,TH,SU');
+ get_byday 
 -----------
  {2,5,1}
 (1 row)
 
-SELECT get_freq('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z'::rrule);
- get_freq
+SELECT get_freq('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z');
+ get_freq 
 ----------
  WEEKLY
 (1 row)
 
 SELECT * FROM
     unnest(
-        get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule,
+        get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2',
             '2019-12-07 10:51:02+00'::timestamp with time zone)
     );
-         unnest
-------------------------
- 2019-12-07 10:51:02+00
- 2019-12-14 10:51:02+00
- 2019-12-21 10:51:02+00
- 2019-12-28 10:51:02+00
+WARNING:  Can't get timezone from current session! Fallback to UTC.
+            unnest            
+------------------------------
+ Sat Dec 07 02:51:02 2019 PST
+ Sat Dec 14 02:51:02 2019 PST
+ Sat Dec 21 02:51:02 2019 PST
+ Sat Dec 28 02:51:02 2019 PST
 (4 rows)
 
 SELECT * FROM
     unnest(
-        get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule,
+        get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2',
             '2019-12-07 10:51:02'::timestamp)
     );
-       unnest
----------------------
- 2019-12-07 10:51:02
- 2019-12-14 10:51:02
- 2019-12-21 10:51:02
- 2019-12-28 10:51:02
+          unnest          
+--------------------------
+ Sat Dec 07 10:51:02 2019
+ Sat Dec 14 10:51:02 2019
+ Sat Dec 21 10:51:02 2019
+ Sat Dec 28 10:51:02 2019
 (4 rows)
 
+SELECT * FROM (SELECT UNNEST(t.occurrence) as occurence
+               FROM get_occurrences('FREQ=WEEKLY;WKST=MO;BYDAY=MO,TU,WE,TH,FR,SA,SU;INTERVAL=1;UNTIL=20200108',
+                                    '20200105'::timestamp) as t(occurrence)
+               UNION
+               SELECT UNNEST(t.occurrence) as occurence
+               FROM get_occurrences('FREQ=WEEKLY;WKST=MO;BYDAY=MO,TU,WE,TH,FR,SA,SU;INTERVAL=1;UNTIL=20200113',
+                                    '20200108'::timestamp) as t(occurrence)) as t
+ORDER BY t.occurence;
+        occurence         
+--------------------------
+ Sun Jan 05 00:00:00 2020
+ Mon Jan 06 00:00:00 2020
+ Tue Jan 07 00:00:00 2020
+ Wed Jan 08 00:00:00 2020
+ Thu Jan 09 00:00:00 2020
+ Fri Jan 10 00:00:00 2020
+ Sat Jan 11 00:00:00 2020
+ Sun Jan 12 00:00:00 2020
+(8 rows)
+
+-- TEST: we want repeat each second thuesday,
+SELECT UNNEST(t.occurrence) as occurence
+FROM get_occurrences('FREQ=WEEKLY;WKST=MO;BYDAY=TU;INTERVAL=2;UNTIL=20200129',
+                     '20200114'::timestamp) as t(occurrence);
+        occurence         
+--------------------------
+ Tue Jan 14 00:00:00 2020
+ Tue Jan 28 00:00:00 2020
+(2 rows)
+
+-- -> we are starting from day we want, and end day is set to +1 day
+-- TEST: change WKST to wednesday and start in middle of week, repeatin until 01-29-2020
+SELECT UNNEST(t.occurrence) as occurence
+FROM get_occurrences('FREQ=WEEKLY;WKST=WE;BYDAY=MO,TU,WE,TH,FR,SA,SU;INTERVAL=2;UNTIL=20200130',
+                     '20200106'::timestamp) as t(occurrence);
+        occurence         
+--------------------------
+ Mon Jan 06 00:00:00 2020
+ Tue Jan 07 00:00:00 2020
+ Wed Jan 15 00:00:00 2020
+ Thu Jan 16 00:00:00 2020
+ Fri Jan 17 00:00:00 2020
+ Sat Jan 18 00:00:00 2020
+ Sun Jan 19 00:00:00 2020
+ Mon Jan 20 00:00:00 2020
+ Tue Jan 21 00:00:00 2020
+ Wed Jan 29 00:00:00 2020
+(10 rows)
+
+-- -> repeat until end of week and then start from the start of next two weeks
+-- TEST: each send month, each second tuesday of month(BYSETPOS=2), 3 times(COUNT=3)
+SELECT UNNEST(t.occurrence) as occurence
+FROM get_occurrences('FREQ=MONTHLY;INTERVAL=2;WKST=MO;BYDAY=TU;BYSETPOS=2;COUNT=3',
+                     '20200106'::timestamp) as t(occurrence);
+        occurence         
+--------------------------
+ Tue Jan 14 00:00:00 2020
+ Tue Mar 10 00:00:00 2020
+ Tue May 12 00:00:00 2020
+(3 rows)
+
+-- 
 ROLLBACK;

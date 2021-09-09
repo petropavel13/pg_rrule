@@ -45,3 +45,8 @@ regression.diffs
 regression.out
 /sql/ extension_name =>--*
 !/sql/<%= extension_name =>--*--*.sql
+
+.vscode/
+/src/pg_rrule.bc
+.sql
+/output

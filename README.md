@@ -1,13 +1,24 @@
 pg_rrule
 ========
 
-Usage
+## Docker Image
+
+docker.pkg.github.com/ondrej-111/pg_rrule/postgres:11.6-alpine-dev
+
+### Pull image 
+`docker pull docker.pkg.github.com/ondrej-111/pg_rrule/postgres:11.6-alpine-dev`
+
+### Use as base image
+
+`FROM docker.pkg.github.com/ondrej-111/pg_rrule/postgres:11.6-alpine-dev`
+
+## Usage
 
 Get RRULE parameter get_PARAMNAME.
 
 Example. Get freq param:
 ```sql
- SELECT get_freq('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z'::rrule);
+ SELECT get_freq('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z');
   get_freq
  ----------
   WEEKLY
@@ -15,7 +26,7 @@ Example. Get freq param:
 ```
 Example. Get byday param:
 ```sql
- SELECT get_byday('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=MO,TH,SU'::rrule);
+ SELECT get_byday('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=MO,TH,SU');
   get_byday
  -----------
   {2,5,1}
@@ -25,7 +36,7 @@ Example. Expand RRULE with timezone:
 ```sql
  SELECT * FROM
      unnest(
-         get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule,
+         get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2',
              '2019-12-07 10:51:02+00'::timestamp with time zone)
      );
 
@@ -41,7 +52,7 @@ Example. Expand RRULE without timezone:
 ```sql
  SELECT * FROM
      unnest(
-         get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2'::rrule,
+         get_occurrences('FREQ=WEEKLY;INTERVAL=1;WKST=MO;UNTIL=20200101T045102Z;BYDAY=SA;BYHOUR=10;BYMINUTE=51;BYSECOND=2',
              '2019-12-07 10:51:02'::timestamp)
      );
 
@@ -152,3 +163,10 @@ Copyright and License
 
 Copyright (c) 2014 petropavel.
 
+## Debug
+
+1. Go inside container like postgres user
+    - psql
+    - SELECT pg_backend_pid(); -> will output PID
+2. Go inside container like root user
+    - lldb -p {PID}
