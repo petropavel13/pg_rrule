@@ -19,7 +19,7 @@ macx {
 }
 
 unix:!macx {
-    INCLUDEPATH += "/usr/include/postgresql/server"
+    INCLUDEPATH += $$system(pg_config --includedir-server)
 
     LIBS += -lpq -lical
 
